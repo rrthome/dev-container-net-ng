@@ -12,6 +12,7 @@ builder.Services.AddRouting(options =>
 });
 
 builder.Services.AddTransient<IExclusaoPedido, ExclusaoPedido>();
+builder.Services.AddTransient<IInclusaoPedido, InclusaoPedido>();
 
 builder.Services.AddControllers();
 

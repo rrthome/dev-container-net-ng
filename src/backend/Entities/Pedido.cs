@@ -10,6 +10,7 @@ public class Pedido
 
     public void CalcularTotal()
     {
-        
+        var subtotal = Itens.Sum(x => x.Preco);
+        Total = subtotal - (subtotal - DescontoPercentual);
     }
 }

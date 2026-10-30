@@ -45,27 +45,20 @@ public class PedidosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CriarPedido([FromBody] PedidoDto dto)
+    public async Task<IActionResult> CriarPedido(
+        [FromBody] PedidoDto dto,
+        [FromServices] IInclusaoPedido inclusaoPedido
+    )
     {
-        if (dto.Itens == null || dto.Itens.Count == 0)
-            return BadRequest("O pedido deve ter ao menos 1 item.");
-
-        var pedido = new Pedido
+        try
         {
-            Id = Guid.NewGuid(),
-            Data = new DateTime(),
-            Status = StatusPedido.NoCarrinho,
-            DescontoPercentual = dto.DescontoPercentual,
-            Itens = dto.Itens.Select(i => new ItemPedido
-            {
-                Nome = i.Nome,
-                Preco = i.Preco
-            }).ToList()
-        };
-
-        _context.Pedidos.Add(pedido);
-        await _context.SaveChangesAsync();
-        return Created();
+            await inclusaoPedido.IncluirPedido(dto);
+            return Created();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Erro na inclusão do pedido: {ex.Message}");
+        }
     }
 
     [HttpPut("{id:guid}")]
