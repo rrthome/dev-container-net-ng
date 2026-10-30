@@ -11,6 +11,8 @@ builder.Services.AddRouting(options =>
     options.LowercaseQueryStrings = false;
 });
 
+builder.Services.AddTransient<IExclusaoPedido, ExclusaoPedido>();
+
 builder.Services.AddControllers();
 
 // Add services to the container.

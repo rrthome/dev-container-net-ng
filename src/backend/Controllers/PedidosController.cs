@@ -7,6 +7,7 @@ namespace backend.Controllers;
 public class PedidosController : ControllerBase
 {
     private readonly AppDbContext _context;
+
     public PedidosController(AppDbContext context)
     {
         _context = context;
@@ -28,36 +29,19 @@ public class PedidosController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult DeletePedido(Guid id)
+    public async Task<IActionResult> DeletePedido(
+        [FromServices] IExclusaoPedido exclusaoPedido,
+        Guid id
+    )
     {
-        var todosPedidos = _context.Pedidos.AsNoTracking().Include(x => x.Itens).ToList();
-
-        Pedido? pedidoAtual = null;
-        foreach(var pedido in todosPedidos)
+        try
         {
-            if(pedido.Id.Equals(id))
-            {
-                pedidoAtual = pedido;
-            }
+            return Ok(await exclusaoPedido.ExcluirPedido(id));
         }
-
-        if (pedidoAtual == null)
+        catch (Exception ex)
         {
-            return NotFound();
+            return BadRequest($"Erro na execução: {ex.Message}");
         }
-        else
-        {
-            _context.Pedidos.RemoveRange(todosPedidos);
-            _context.SaveChanges();
-
-            todosPedidos.Remove(pedidoAtual);
-            _context.AddRange(todosPedidos);
-            _context.SaveChanges();
-            
-            return Ok();
-        }
-        
-        return NoContent();
     }
 
     [HttpPost]
